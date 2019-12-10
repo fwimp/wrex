@@ -309,6 +309,7 @@ def make_field_str(fieldname, fielddata, verbose=False):
     if verbose:
         print("{}: {}".format(fieldname, fielddata))
     if isinstance(fielddata, list):
+        fielddata = [str(x) for x in fielddata]
         outstr += "\n   ".join(fielddata)
     else:
         outstr += str(fielddata)
