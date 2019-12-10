@@ -309,8 +309,12 @@ def make_field_str(fieldname, fielddata, verbose=False):
     if verbose:
         print("{}: {}".format(fieldname, fielddata))
     if isinstance(fielddata, list):
-        fielddata = [str(x) for x in fielddata]
-        outstr += "\n   ".join(fielddata)
+        try:
+            outstr += "\n   ".join(fielddata)
+        except TypeError:
+            # Only force-cast to string if list fails due to a type error
+            fielddata = [str(x) for x in fielddata]
+            outstr += "\n   ".join(fielddata)
     else:
         outstr += str(fielddata)
     return outstr
