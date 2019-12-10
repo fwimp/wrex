@@ -351,7 +351,7 @@ def dict_from_WOSmultilist(raw, key="type", content="content"):
 
 def make_field_dict(rawdata, printmissing=False):
     # This multiple try/except segment is long-winded but right now I'm leaving it here for ease of understanding
-    # It could possibly be done with another sub-function, or
+    # It could possibly be done with another sub-function
 
     # TODO: Look at FITTING the data in here to the published model and fix it to be so if needed.
     #   - Make model validator
@@ -366,7 +366,11 @@ def make_field_dict(rawdata, printmissing=False):
         missing.add("PT")
 
     try:
-        workingdict["LA"] = rawdata["static_data"]["fullrecord_metadata"]["languages"]["language"]["content"]
+        if rawdata["static_data"]["fullrecord_metadata"]["languages"]["count"] <= 1:
+            workingdict["LA"] = rawdata["static_data"]["fullrecord_metadata"]["languages"]["language"]["content"]
+        else:
+            ladict = dict_from_WOSlist(rawdata["static_data"]["fullrecord_metadata"]["languages"]["language"])
+            workingdict["LA"] = ladict["primary"]
     except KeyError:
         missing.add("LA")
 
