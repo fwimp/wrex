@@ -178,31 +178,34 @@ class WOSpaper:
         self.parse_rawdata()
 
     def __repr__(self):
-        return ""
+        return self.__repr__()
 
     def __str__(self):
-        return "UID: {0}\nTitle: {1}\nAuthors: {2} and {3} other/s\n".format(self.uid, self.title,
-                                                                             self.authors[0]["full_name"],
+        return "UID: {0}\nTitle: {1}\nAuthors: {2} and {3} other/s\n".format(self.uid,
+                                                                             self.title,
+                                                                             self.authors[0],
                                                                              len(self.authors) - 1)
 
     def parse_rawdata(self):
-        self.uid = self.rawdata["UID"]
-        self.title = self.rawdata["static_data"]["summary"]["titles"]["title"][-1]["content"]
-        self.authors = self.rawdata["static_data"]["summary"]["names"]["name"]
-        self.year = self.rawdata["static_data"]["summary"]["pub_info"]["pubyear"]
+        self._fielddict = make_field_dict(self.rawdata)
+        self.uid = self._fielddict.get("UT", "")
+        self.title = self._fielddict.get("TI", "")
+        self.authors = self._fielddict.get("AU", [])
+        self.year = self._fielddict.get("PY", "")
+        self.volume = self._fielddict.get("VL", "")
+        self.issue = self._fielddict.get("IS", "")
+        self.publication = self._fielddict.get("SO", "")
+        self.keywords = self._fielddict.get("ID", [])
 
-    #         self.volume = self.rawdata["static_data"]["summary"]["pub_info"]["vol"]
-    #         self.issue = self.rawdata["static_data"]["summary"]["pub_info"]["issue"]
-    #         self.identifiers = {x["type"]: x["value"] for x in self.rawdata["dynamic_data"]["cluster_related"]["identifiers"]["identifier"]}
-    #         self.publication = self.rawdata["static_data"]["summary"]["titles"]["title"][0]["content"]
-    #         self.keywords = self.rawdata["static_data"]["item"]["keywords_plus"]["keyword"]
-
-    def fielddict(self, regenerate=False, printmissing=False):
+    def fielddict(self, return_dict=False, regenerate=False, printmissing=False):
         if not self._fielddict:
             self._fielddict = make_field_dict(self.rawdata, printmissing)
         elif regenerate:
             self._fielddict = make_field_dict(self.rawdata, printmissing)
-        return "\n".join([make_field_str(x, self._fielddict[x]) for x in self._fielddict])
+        if return_dict:
+            return self._fielddict
+        else:
+            return "\n".join([make_field_str(x, self._fielddict[x]) for x in self._fielddict])
 
 
 def rawquery(conn, querystr):
@@ -330,9 +333,9 @@ def list_from_WOSlist(raw, key=None):
             return [x[key] for x in raw]
     elif isinstance(raw, dict):
         if key is None:
-            return raw
+            return [raw]
         else:
-            return raw[key]
+            return [raw[key]]
     else:
         return [raw]
 
