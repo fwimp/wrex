@@ -12,7 +12,7 @@ Here is an example of performing a simple query:
 ```python
 WOS = WOSconnection(key="...", parameters={"databaseId": "WOS", "count": 100, "firstRecord": 1})
 
-quertstr = "AU=(Knuth, D*)"
+querystr = "AU=(Knuth, D*)"
 currquery = query(WOS, querystr)
 ```
 
